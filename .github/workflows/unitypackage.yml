@@ -1,0 +1,31 @@
+name: Create Unity Package
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  echo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          echo "Unity/Assets/Hicore.meta" > metaList
+          find Unity/Assets/Hicore/ -name \*.meta >> metaList
+
+      - run: mkdir build
+
+      - uses: pCYSl5EDgo/create-unitypackage@master
+        with:
+          package-path: 'build/Hicore.unitypackage'
+          include-files: metaList
+      - uses: actions/upload-artifact@master
+        with:
+          path: build
+          name: package
+      - name: Release Apps
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: 'build/Hicore.unitypackage'

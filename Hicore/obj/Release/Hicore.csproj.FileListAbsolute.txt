@@ -1,0 +1,9 @@
+C:\Users\Farzad\Documents\Projects\C#\Hicore\bin\Release\Hicore.dll
+C:\Users\Farzad\Documents\Projects\C#\Hicore\bin\Release\Hicore.pdb
+C:\Users\Farzad\Documents\Projects\C#\Hicore\Hicore\obj\Release\Hicore.csprojAssemblyReference.cache
+C:\Users\Farzad\Documents\Projects\C#\Hicore\Hicore\obj\Release\Hicore.csproj.CoreCompileInputs.cache
+C:\Users\Farzad\Documents\Projects\C#\Hicore\Hicore\obj\Release\Hicore.csproj.CopyComplete
+C:\Users\Farzad\Documents\Projects\C#\Hicore\Hicore\obj\Release\Hicore.dll
+C:\Users\Farzad\Documents\Projects\C#\Hicore\Hicore\obj\Release\Hicore.pdb
+C:\Users\Farzad\Documents\Projects\C#\Hicore\Unity\Assets\Hicore\Plugins\Hicore.dll
+C:\Users\Farzad\Documents\Projects\C#\Hicore\Unity\Assets\Hicore\Plugins\Hicore.pdb
