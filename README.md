@@ -1,4 +1,4 @@
-﻿# Hicore Uinty
+﻿# Hicore Unity
 
 This client is built for Unity3D Engine. You can download Hicore.unitypackage from the [release page](https://github.com/hicore/hicore-unity/releases) and import it to your project and start.
 For more information check [Unity Doc](https://hicore.dev/unity/)
@@ -49,7 +49,7 @@ For connecting to child server add this line to Start function
 
 ## Socket Messages
 
-If you want see a socket messages such as server status, you can follow this structure
+If you want to see a socket messages such as server status, you can follow this structure
 
 ```csharp
     socket.OnConnected += () => { Debug.Log("Connected"); };
