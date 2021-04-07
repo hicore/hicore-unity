@@ -10,13 +10,13 @@ namespace Hicore.Storage
         private HicoreSocket _socket;
         private string storageEvent = "storage";
 
-        private string createClassEvent = "createClass";
+        private string addObjectEvent = "addObject";
         private string updateClassEvent = "updateClass";
         private string incrementValueEvent = "incrementValue";
-        private string catchDataEvent = "catchData";
+        private string fetchDataEvent = "fetchData";
         private string deleteObjectEvent = "deleteObject";
 
-        private Action<Result> OnCrateClassResult;
+        private Action<Result> OnAddObjectResult;
         private Action<Result> OnUpdateClassResult;
         private Action<Result> OnIncrementValueResult;
         private Action<Result> OnFetchDataResult;
@@ -28,9 +28,9 @@ namespace Hicore.Storage
             this._socket = socket;
 
 
-            _socket.On(createClassEvent, res =>
+            _socket.On(addObjectEvent, res =>
             {
-                OnCrateClassResult(new Result(res.Text));
+                OnAddObjectResult(new Result(res.Text));
             });
 
             _socket.On(updateClassEvent, res =>
@@ -43,7 +43,7 @@ namespace Hicore.Storage
                 OnIncrementValueResult(new Result(res.Text));
             });
 
-            _socket.On(catchDataEvent, res =>
+            _socket.On(fetchDataEvent, res =>
             {
                 OnFetchDataResult(new Result(res.Text));
             });
@@ -54,37 +54,25 @@ namespace Hicore.Storage
             });
         }
 
-        public void CreateClass(DataObject data, Action<Result> onResult)
+        public void AddObject(DataObject data, Action<Result> onResult)
         {
             JSONObject json = new JSONObject();
-            json.Add("type", StorageType.create.ToString());
-            json.Add("class" , data._class);
-            json.Add("data", data.getData()); // send as json 
+            json.Add("type", StorageType.add.ToString());
+            json.Add("collection" , data._collection);
+            json.Add("data", data.GetData()); // send as json 
             json.Add("token", Client.Token);
 
             _socket.Emit(storageEvent, json.ToString());
 
-            OnCrateClassResult = (res) => { onResult(res); };
+            OnAddObjectResult = (res) => { onResult(res); };
         }
-
-        public void UpdateClass(DataObject data, Action<Result> onResult)
-        {
-            JSONObject json = new JSONObject();
-            json.Add("type", StorageType.update.ToString());
-            json.Add("class", data._class);
-            json.Add("data", data.getData()); // send as json 
-            json.Add("token", Client.Token);
-
-            _socket.Emit(storageEvent, json.ToString());
-
-            OnUpdateClassResult = (res) => { onResult(res); };
-        }
+        
         public void IncrementValue(DataObject data, Action<Result> onResult)
         {
             JSONObject json = new JSONObject();
             json.Add("type", StorageType.increment.ToString());
-            json.Add("class", data._class);
-            json.Add("data", data.getData()); 
+            json.Add("collection", data._collection);
+            json.Add("data", data.GetData()); 
             json.Add("token", Client.Token);
 
             _socket.Emit(storageEvent, json.ToString());
@@ -92,11 +80,11 @@ namespace Hicore.Storage
             OnIncrementValueResult = (res) => { onResult(res); };
         }
 
-        public void FetchData(string className, Action<Result> onResult)
+        public void FetchData(string collectionName, Action<Result> onResult)
         {
             JSONObject json = new JSONObject();
-            json.Add("type", StorageType.get.ToString());
-            json.Add("class", className);
+            json.Add("type", StorageType.fetch.ToString());
+            json.Add("collection", collectionName);
             json.Add("token", Client.Token);
 
             _socket.Emit(storageEvent, json.ToString());
@@ -105,11 +93,12 @@ namespace Hicore.Storage
 
         }
         
-        public void DeleteObject(string className, Action<Result> onResult)
+        public void DeleteObject(string collectionName,List<String> keys, Action<Result> onResult)
         {
             JSONObject json = new JSONObject();
             json.Add("type", StorageType.delete.ToString());
-            json.Add("class", className);
+            json.Add("collection", collectionName);
+            json.Add("keys", ConvertListToJsonObject(keys)); 
             json.Add("token", Client.Token);
 
             _socket.Emit(storageEvent, json.ToString());
@@ -118,14 +107,24 @@ namespace Hicore.Storage
 
         }
 
+        public JSONObject ConvertListToJsonObject(List<String> keys)
+        {
+            JSONObject json = new JSONObject();
+           
+            foreach (String key in keys)
+            {
+                json.Add(key, 1);
+            }
+
+            return json;
+        }
 
 
         private enum StorageType
         {
-            create,
-            update,
+            add,
             increment,
-            get,
+            fetch,
             delete,
         }
     }
@@ -134,18 +133,18 @@ namespace Hicore.Storage
     public class DataObject
     {
         private Dictionary<string, JSONNode> m_data = new Dictionary<string, JSONNode>();
-        internal string _class;
+        internal string _collection;
 
         private string key;
         private JSONNode value;
 
 
-        public DataObject(string className)
+        public DataObject(string collectionName)
         {
-            this._class = className;
+            this._collection = collectionName;
         }
 
-        public void add(string key, JSONNode value) 
+        public void Add(string key, JSONNode value) 
         {
 
             if (m_data.ContainsKey(key))
@@ -158,7 +157,7 @@ namespace Hicore.Storage
             }
         }
 
-        public void increment(string key , int value)
+        public void Increment(string key , int value)
         {
             if (m_data.ContainsKey(key))
             {
@@ -172,7 +171,7 @@ namespace Hicore.Storage
 
 
 
-        public JSONObject getData()
+        public JSONObject GetData()
         {
             JSONObject json = new JSONObject();
            
@@ -183,14 +182,14 @@ namespace Hicore.Storage
 
             return json;
         }
-
-        public DataObject setKey(string key)
+        
+        public DataObject SetKey(string key)
         {
             this.key = key;
             return this;
         }
 
-        public DataObject setValue(JSONNode value)
+        public DataObject SetValue(JSONNode value)
         {
             this.value = value;
             return this;
